@@ -1,0 +1,41 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import netCDF4 as nc
+
+from os import listdir
+from os.path import isfile, join
+fichiers = [f for f in listdir('tccon.latest.public') if isfile(join('tccon.latest.public', f))]
+
+
+# # for Paris
+# data = nc.Dataset("tccon.latest.public/pr20140923_20220328.public.qc.nc")
+
+# for j in range(len(fichiers)): #parcours tous les fichiers
+for j in range(1): # un exemple sur un seul site
+    data = nc.Dataset('tccon.latest.public/'+fichiers[j])
+    # print(data.variables.keys())
+    
+    # print(data.variables['xch4'])
+    xch4 = data.variables['xch4'][:]
+    time = data.variables['time'][:]/3600/24/365 + 1970
+    flag = data.variables['extrapolation_flags_ak_xch4'][:]
+    
+    xch4_flag0 = []
+    time_flag0 = []
+    for i in range(len(xch4)):
+        if flag[i] == 0:
+            xch4_flag0 += [xch4[i]]
+            time_flag0 += [time[i]]
+        
+    
+    plt.figure(figsize=[18,10])
+    plt.title('xch4 vs time', fontsize=30)
+    # plt.scatter(time,xch4)
+    # plt.scatter(time,flag)
+    plt.scatter(time_flag0,xch4_flag0)
+    plt.ylabel('xch4 (ppm)', fontsize=30)
+    plt.xlabel('time (year)', fontsize=30)
+    plt.xticks(fontsize=30)
+    plt.yticks(fontsize=30)
+    plt.grid()
+    plt.show()
